@@ -1,0 +1,855 @@
+/* استيراد خط IBM Plex Sans Arabic */
+@font-face {
+    font-family: 'IBM Plex Sans Arabic';
+    src: url('../assets/fonts/IBMPlexSansArabic-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'IBM Plex Sans Arabic';
+    src: url('../assets/fonts/IBMPlexSansArabic-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'IBM Plex Sans Arabic';
+    src: url('../assets/fonts/IBMPlexSansArabic-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'IBM Plex Sans Arabic';
+    src: url('../assets/fonts/IBMPlexSansArabic-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+/* المتغيرات اللونية */
+:root {
+    --primary-bg: #0F1724;
+    --secondary-bg: #1A2332;
+    --card-bg: #212D3F;
+    --hover-bg: #2A3A4F;
+    --border-color: #3A4A5F;
+    
+    --primary-color: #4A90E2;
+    --secondary-color: #5FB3B3;
+    --success-color: #6FCF97;
+    --warning-color: #F2C94C;
+    --danger-color: #EB5757;
+    
+    --text-primary: #E8EDF2;
+    --text-secondary: #B8C5D6;
+    --text-muted: #7A8A9F;
+    
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+    
+    --transition: all 0.3s ease;
+}
+
+/* إعدادات عامة */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    background-color: var(--primary-bg);
+    color: var(--text-primary);
+    direction: rtl;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* الحاوية الرئيسية */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* الشبكة */
+.grid {
+    display: grid;
+    gap: 20px;
+}
+
+.grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.grid-4 {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* Flexbox */
+.flex {
+    display: flex;
+    gap: 15px;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+/* الهيدر */
+.header {
+    background-color: var(--secondary-bg);
+    border-bottom: 2px solid var(--border-color);
+    padding: 20px 0;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.logo i {
+    font-size: 32px;
+}
+
+/* القائمة الرئيسية */
+.nav {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.nav-link {
+    padding: 10px 20px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    background-color: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+.nav-link.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* البطاقات */
+.card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    border: 1px solid var(--border-color);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.card-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-body {
+    color: var(--text-secondary);
+}
+
+/* الأزرار */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #3A7BC8;
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #5AB87D;
+}
+
+.btn-warning {
+    background-color: var(--warning-color);
+    color: #333;
+}
+
+.btn-warning:hover {
+    background-color: #D9B43C;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #D14747;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--hover-bg);
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.btn-lg {
+    padding: 16px 32px;
+    font-size: 18px;
+}
+
+/* النماذج */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-label.required::after {
+    content: ' *';
+    color: var(--danger-color);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-size: 16px;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+select.form-control {
+    cursor: pointer;
+}
+
+/* الجداول */
+.table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    background-color: var(--card-bg);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 15px;
+    text-align: right;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+    background-color: var(--secondary-bg);
+    font-weight: 600;
+    color: var(--text-primary);
+    position: sticky;
+    top: 0;
+}
+
+.table tr:hover {
+    background-color: var(--hover-bg);
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+/* الشارات */
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: rgba(111, 207, 151, 0.2);
+    color: var(--success-color);
+}
+
+.badge-warning {
+    background-color: rgba(242, 201, 76, 0.2);
+    color: var(--warning-color);
+}
+
+.badge-danger {
+    background-color: rgba(235, 87, 87, 0.2);
+    color: var(--danger-color);
+}
+
+.badge-info {
+    background-color: rgba(74, 144, 226, 0.2);
+    color: var(--primary-color);
+}
+
+/* التنبيهات */
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.alert i {
+    font-size: 20px;
+}
+
+.alert-success {
+    background-color: rgba(111, 207, 151, 0.15);
+    border-right: 4px solid var(--success-color);
+    color: var(--success-color);
+}
+
+.alert-warning {
+    background-color: rgba(242, 201, 76, 0.15);
+    border-right: 4px solid var(--warning-color);
+    color: var(--warning-color);
+}
+
+.alert-danger {
+    background-color: rgba(235, 87, 87, 0.15);
+    border-right: 4px solid var(--danger-color);
+    color: var(--danger-color);
+}
+
+.alert-info {
+    background-color: rgba(74, 144, 226, 0.15);
+    border-right: 4px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* البحث */
+.search-box {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 45px 12px 16px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+/* القوائم */
+.list-group {
+    list-style: none;
+}
+
+.list-item {
+    padding: 15px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    margin-bottom: 10px;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.list-item:hover {
+    background-color: var(--hover-bg);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.modal-title {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 28px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    color: var(--danger-color);
+}
+
+/* Loading */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Utilities */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.mt-1 { margin-top: 10px; }
+.mt-2 { margin-top: 20px; }
+.mt-3 { margin-top: 30px; }
+
+.mb-1 { margin-bottom: 10px; }
+.mb-2 { margin-bottom: 20px; }
+.mb-3 { margin-bottom: 30px; }
+
+.p-1 { padding: 10px; }
+.p-2 { padding: 20px; }
+.p-3 { padding: 30px; }
+
+.hidden {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-container {
+        font-size: 14px;
+    }
+    
+    .table th,
+    .table td {
+        padding: 10px;
+    }
+}
+
+/* صفحة المريض */
+.patient-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    padding: 15px;
+    background-color: var(--secondary-bg);
+    border-radius: 8px;
+    border-right: 3px solid var(--primary-color);
+}
+
+.info-label {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.info-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* قائمة الأدوية */
+.medication-list {
+    list-style: none;
+}
+
+.medication-item {
+    padding: 12px;
+    background-color: var(--secondary-bg);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* الوصفة الطبية */
+.prescription-item {
+    padding: 20px;
+    background-color: var(--secondary-bg);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-right: 4px solid var(--primary-color);
+}
+
+.prescription-item.warning {
+    border-right-color: var(--warning-color);
+}
+
+.prescription-item.danger {
+    border-right-color: var(--danger-color);
+}
+
+.drug-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.drug-details {
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.drug-detail {
+    display: flex;
+    gap: 10px;
+}
+
+.drug-detail-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    min-width: 100px;
+}
+
+.drug-detail-value {
+    color: var(--text-primary);
+}
+
+/* صفحة الوصفة */
+.suggestions-container {
+    display: grid;
+    gap: 15px;
+}
+
+.suggestion-card {
+    padding: 20px;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.suggestion-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.suggestion-card.selected {
+    border-color: var(--primary-color);
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+.suggestion-card.has-warning {
+    border-color: var(--warning-color);
+}
+
+.suggestion-card.has-danger {
+    border-color: var(--danger-color);
+}
+
+/* حقول ديناميكية */
+.dynamic-field {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.dynamic-field input {
+    flex: 1;
+}
+
+.btn-remove {
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-remove:hover {
+    background-color: #D14747;
+}
+
+.btn-add {
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-add:hover {
+    background-color: #5AB87D;
+}
+
+/* دعم LTR للغة الإنجليزية */
+body.ltr {
+    direction: ltr;
+}
+
+body.ltr .header-content {
+    flex-direction: row-reverse;
+}
+
+body.ltr .nav {
+    flex-direction: row-reverse;
+}
+
+body.ltr .card-header {
+    flex-direction: row-reverse;
+}
+
+body.ltr .flex {
+    flex-direction: row-reverse;
+}
+
+body.ltr .search-box i {
+    right: auto;
+    left: 16px;
+}
+
+body.ltr .search-box input {
+    padding-right: 16px;
+    padding-left: 50px;
+}
+
+body.ltr .input-group i {
+    right: auto;
+    left: 16px;
+}
+
+body.ltr .input-group input {
+    padding-right: 16px;
+    padding-left: 50px;
+}
+
+body.ltr .medication-item,
+body.ltr .suggestion-card,
+body.ltr .prescription-item {
+    border-right: none;
+    border-left: 3px solid var(--primary-color);
+}
+
+body.ltr .medication-item[style*="border-right: 3px solid var(--warning-color)"] {
+    border-right: none !important;
+    border-left: 3px solid var(--warning-color) !important;
+}
+
+body.ltr .medication-item[style*="border-right: 3px solid var(--danger-color)"] {
+    border-right: none !important;
+    border-left: 3px solid var(--danger-color) !important;
+}
+
+body.ltr .alert i {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+body.ltr .badge {
+    margin-right: 0;
+    margin-left: 5px;
+}
+
+body.ltr .patient-info,
+body.ltr .info-item {
+    text-align: left;
+}
+
+body.ltr .drug-detail {
+    flex-direction: row-reverse;
+}
+
+body.ltr ul {
+    padding-right: 0;
+    padding-left: 20px;
+}
+
+body.ltr .dynamic-field {
+    flex-direction: row-reverse;
+}

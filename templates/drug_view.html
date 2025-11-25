@@ -1,0 +1,192 @@
+{% extends "layout.html" %}
+
+{% block title %}<span class="drug-name-title">{{ drug.name }}</span> - <span data-translate="app_name">وصفتي</span>{% endblock %}
+
+{% block content %}
+<div class="mt-3">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">
+                <i class="fa fa-capsules"></i>
+                <span class="drug-name-header">{{ drug.name }}</span>
+            </h1>
+            <div class="flex" style="gap: 10px;">
+                <a href="{{ url_for('drug_edit', drug_id=drug.id) }}" class="btn btn-secondary">
+                    <i class="fa fa-edit"></i> <span data-translate="drug_view.edit_data">تعديل البيانات</span>
+                </a>
+                <a href="{{ url_for('drugs_list') }}" class="btn btn-primary">
+                    <i class="fa fa-arrow-right"></i> <span data-translate="drug_view.back_to_list">العودة للقائمة</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <!-- المعلومات الأساسية -->
+            <div class="grid grid-2">
+                <div class="info-item">
+                    <div class="info-label" data-translate="drug_view.category">الفئة</div>
+                    <div class="info-value">
+                        <span class="badge badge-info category-badge" style="font-size: 16px;">{{ drug.category }}</span>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label" data-translate="drug_view.status">الحالة</div>
+                    <div class="info-value">
+                        {% if drug.available %}
+                        <span class="badge badge-success" style="font-size: 16px;" data-translate="drug_view.available">متوفر</span>
+                        {% else %}
+                        <span class="badge badge-danger" style="font-size: 16px;" data-translate="drug_view.unavailable">غير متوفر</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- الوصف -->
+            {% if drug.description %}
+            <div class="mt-3">
+                <h3 style="color: var(--primary-color); margin-bottom: 10px;">
+                    <i class="fa fa-info-circle"></i> <span data-translate="drug_view.description">الوصف</span>
+                </h3>
+                <div style="padding: 15px; background-color: var(--secondary-bg); border-radius: 8px;">
+                    {{ drug.description }}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- الجرعات المتاحة -->
+            <div class="mt-3">
+                <h3 style="color: var(--primary-color); margin-bottom: 10px;">
+                    <i class="fa fa-syringe"></i> <span data-translate="drug_view.available_dosages">الجرعات المتاحة</span>
+                </h3>
+                {% set dosages = drug.get_dosages() %}
+                {% if dosages %}
+                <div class="grid grid-4">
+                    {% for dosage in dosages %}
+                    <div class="info-item">
+                        <div class="info-value">{{ dosage }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fa fa-info-circle"></i>
+                    <span data-translate="drug_view.no_dosages">لا توجد جرعات محددة</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- التداخلات الدوائية -->
+            <div class="mt-3">
+                <h3 style="color: var(--warning-color); margin-bottom: 10px;">
+                    <i class="fa fa-triangle-exclamation"></i> <span data-translate="drug_view.drug_interactions">التداخلات الدوائية</span>
+                </h3>
+                {% set interactions = drug.get_interactions() %}
+                {% if interactions %}
+                <ul class="medication-list">
+                    {% for interaction in interactions %}
+                    <li class="medication-item interaction-item" style="border-right: 3px solid var(--warning-color);">
+                        <i class="fa fa-exclamation-triangle" style="color: var(--warning-color);"></i>
+                        <span class="interaction-name">{{ interaction }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="alert alert-success">
+                    <i class="fa fa-check-circle"></i>
+                    <span data-translate="drug_view.no_interactions">لا توجد تداخلات دوائية مسجلة</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- الموانع -->
+            <div class="mt-3">
+                <h3 style="color: var(--danger-color); margin-bottom: 10px;">
+                    <i class="fa fa-ban"></i> <span data-translate="drug_view.contraindications">الموانع</span>
+                </h3>
+                {% set contraindications = drug.get_contraindications() %}
+                {% if contraindications %}
+                <ul class="medication-list">
+                    {% for contraindication in contraindications %}
+                    <li class="medication-item" style="border-right: 3px solid var(--danger-color);">
+                        <i class="fa fa-circle-xmark" style="color: var(--danger-color);"></i>
+                        {{ contraindication }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="alert alert-success">
+                    <i class="fa fa-check-circle"></i>
+                    <span data-translate="drug_view.no_contraindications">لا توجد موانع مسجلة</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- التحذيرات -->
+            {% if drug.warnings %}
+            <div class="mt-3">
+                <h3 style="color: var(--danger-color); margin-bottom: 10px;">
+                    <i class="fa fa-exclamation-circle"></i> <span data-translate="drug_view.warnings">تحذيرات مهمة</span>
+                </h3>
+                <div class="alert alert-danger">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    {{ drug.warnings }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// ترجمة القيم الديناميكية عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    translateDrugViewContent();
+});
+
+// ترجمة القيم عند تبديل اللغة
+document.addEventListener('languageChanged', function() {
+    translateDrugViewContent();
+});
+
+function translateDrugViewContent() {
+    // ترجمة اسم الدواء في العنوان والـ header
+    const drugNameTitle = document.querySelector('.drug-name-title');
+    const drugNameHeader = document.querySelector('.drug-name-header');
+    
+    if (drugNameTitle) {
+        const translatedName = translator.translateCommonDrugNames(drugNameTitle.textContent.trim());
+        const translatedUnits = translator.translateMedicalUnits(translatedName);
+        drugNameTitle.textContent = translatedUnits;
+    }
+    
+    if (drugNameHeader) {
+        const translatedName = translator.translateCommonDrugNames(drugNameHeader.textContent.trim());
+        const translatedUnits = translator.translateMedicalUnits(translatedName);
+        drugNameHeader.textContent = translatedUnits;
+    }
+    
+    // ترجمة الفئة
+    const categoryBadge = document.querySelector('.category-badge');
+    if (categoryBadge) {
+        categoryBadge.textContent = translator.translateCategory(categoryBadge.textContent.trim());
+    }
+    
+    // ترجمة الجرعات المتاحة
+    const dosageValues = document.querySelectorAll('.info-value');
+    dosageValues.forEach(value => {
+        const text = value.textContent.trim();
+        if (text.match(/\d+\s*(mg|ملغ|g|غ|ml|مل|tablet|قرص|capsule|كبسولة)/i)) {
+            value.textContent = translator.translateMedicalUnits(text);
+        }
+    });
+    
+    // ترجمة التداخلات الدوائية
+    const interactionNames = document.querySelectorAll('.interaction-name');
+    interactionNames.forEach(name => {
+        const translated = translator.translateCommonDrugNames(name.textContent.trim());
+        name.textContent = translator.translateMedicalUnits(translated);
+    });
+}
+</script>
+{% endblock %}

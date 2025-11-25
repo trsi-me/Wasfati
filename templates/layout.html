@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}<span data-translate="app_name">وصفتي</span> - <span data-translate="app_description">نظام الوصفات الطبية</span>{% endblock %}</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="rtl">
+    <!-- الهيدر -->
+    <header class="header">
+        <div class="header-content">
+            <a href="{{ url_for('index') }}" class="logo">
+                <i class="fa fa-prescription-bottle-medical"></i>
+                <span data-translate="app_name">وصفتي</span>
+            </a>
+            
+            <nav class="nav">
+                <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fa fa-home"></i> <span data-translate="nav.home">الرئيسية</span>
+                </a>
+                <a href="{{ url_for('patients_list') }}" class="nav-link {% if 'patient' in request.endpoint %}active{% endif %}">
+                    <i class="fa fa-users"></i> <span data-translate="nav.patients">المرضى</span>
+                </a>
+                <a href="{{ url_for('drugs_list') }}" class="nav-link {% if 'drug' in request.endpoint %}active{% endif %}">
+                    <i class="fa fa-pills"></i> <span data-translate="nav.drugs">الأدوية</span>
+                </a>
+                <button id="lang-toggle" class="nav-link" onclick="translator.toggleLanguage()" style="background-color: var(--secondary-color); color: white; border: none; cursor: pointer;">
+                    <i class="fa fa-language"></i> English
+                </button>
+                {% if session.get('user_id') %}
+                <a href="{{ url_for('logout') }}" class="nav-link" style="background-color: var(--danger-color); color: white;">
+                    <i class="fa fa-sign-out-alt"></i> <span data-translate="nav.logout">تسجيل الخروج</span>
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+    
+    <!-- المحتوى الرئيسي -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/translator.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,157 @@
+{% extends "layout.html" %}
+
+{% block title %}<span data-translate="drugs.title">قائمة الأدوية</span> - <span data-translate="app_name">وصفتي</span>{% endblock %}
+
+{% block content %}
+<div class="mt-3">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">
+                <i class="fa fa-pills"></i>
+                <span data-translate="drugs.title">قاعدة بيانات الأدوية</span>
+            </h1>
+            <a href="{{ url_for('drug_new') }}" class="btn btn-success">
+                <i class="fa fa-plus"></i> <span data-translate="drugs.add_new">إضافة دواء جديد</span>
+            </a>
+        </div>
+        
+        <div class="card-body">
+            <!-- البحث والفلتر -->
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <div class="search-box">
+                        <input type="text" class="form-control" data-translate="drugs.search_placeholder" placeholder="البحث عن دواء..." 
+                               value="{{ search }}" 
+                               onchange="updateFilters()">
+                        <i class="fa fa-search"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <select class="form-control" id="category-filter" onchange="updateFilters()">
+                        <option value="" data-translate="drugs.all_categories">جميع الفئات</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" class="category-option" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            {% if drugs %}
+            <div class="table-container mt-2">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th data-translate="drugs.drug_name">اسم الدواء</th>
+                            <th data-translate="drugs.category">الفئة</th>
+                            <th data-translate="drugs.available_dosages">الجرعات المتاحة</th>
+                            <th data-translate="drugs.status">الحالة</th>
+                            <th data-translate="patients.actions">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for drug in drugs %}
+                        <tr>
+                            <td><strong class="drug-name-cell">{{ drug.name }}</strong></td>
+                            <td>
+                                <span class="badge badge-info category-badge">{{ drug.category }}</span>
+                            </td>
+                            <td class="dosages-cell">
+                                {% set dosages = drug.get_dosages() %}
+                                {% if dosages %}
+                                    {{ dosages|join(', ') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if drug.available %}
+                                <span class="badge badge-success" data-translate="drugs.available">متوفر</span>
+                                {% else %}
+                                <span class="badge badge-danger" data-translate="drugs.unavailable">غير متوفر</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="flex" style="gap: 5px;">
+                                    <a href="{{ url_for('drug_view', drug_id=drug.id) }}" 
+                                       class="btn btn-primary btn-sm">
+                                        <i class="fa fa-eye"></i> <span data-translate="patients.view">عرض</span>
+                                    </a>
+                                    <a href="{{ url_for('drug_edit', drug_id=drug.id) }}" 
+                                       class="btn btn-secondary btn-sm">
+                                        <i class="fa fa-edit"></i> <span data-translate="patients.edit">تعديل</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info mt-2">
+                <i class="fa fa-info-circle"></i>
+                {% if search or selected_category %}
+                <span data-translate="drugs.no_results">لا توجد نتائج للبحث</span>
+                {% else %}
+                <span data-translate="drugs.no_drugs">لا توجد أدوية مسجلة في النظام</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// ترجمة محتوى الجدول عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    translateDrugsListContent();
+});
+
+// ترجمة المحتوى عند تبديل اللغة
+document.addEventListener('languageChanged', function() {
+    translateDrugsListContent();
+});
+
+function translateDrugsListContent() {
+    // ترجمة أسماء الأدوية في الجدول
+    document.querySelectorAll('.drug-name-cell').forEach(cell => {
+        const drugName = cell.textContent.trim();
+        const translatedName = translator.translateCommonDrugNames(drugName);
+        const translatedUnits = translator.translateMedicalUnits(translatedName);
+        cell.textContent = translatedUnits;
+    });
+    
+    // ترجمة الفئات في الجدول
+    document.querySelectorAll('.category-badge').forEach(badge => {
+        const category = badge.textContent.trim();
+        badge.textContent = translator.translateCategory(category);
+    });
+    
+    // ترجمة الجرعات في الجدول
+    document.querySelectorAll('.dosages-cell').forEach(cell => {
+        const dosages = cell.textContent.trim();
+        if (dosages !== '-') {
+            cell.textContent = translator.translateMedicalUnits(dosages);
+        }
+    });
+    
+    // ترجمة الفئات في القائمة المنسدلة
+    document.querySelectorAll('.category-option').forEach(option => {
+        const category = option.textContent.trim();
+        option.textContent = translator.translateCategory(category);
+    });
+}
+
+function updateFilters() {
+    const search = document.querySelector('.search-box input').value;
+    const category = document.getElementById('category-filter').value;
+    
+    let url = '{{ url_for("drugs_list") }}?';
+    if (search) url += 'search=' + encodeURIComponent(search) + '&';
+    if (category) url += 'category=' + encodeURIComponent(category);
+    
+    window.location.href = url;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends "layout.html" %}
+
+{% block title %}{% if drug %}<span data-translate="drug_edit.title_edit">تعديل بيانات الدواء</span>{% else %}<span data-translate="drug_edit.title_new">إضافة دواء جديد</span>{% endif %} - <span data-translate="app_name">وصفتي</span>{% endblock %}
+
+{% block content %}
+<div class="mt-3">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">
+                <i class="fa fa-capsules"></i>
+                {% if drug %}<span data-translate="drug_edit.title_edit">تعديل بيانات الدواء</span>{% else %}<span data-translate="drug_edit.title_new">إضافة دواء جديد</span>{% endif %}
+            </h1>
+        </div>
+        
+        <div class="card-body">
+            <form id="drug-form" onsubmit="event.preventDefault(); saveDrug('drug-form', {{ drug.id if drug else 'null' }});">
+                <div class="grid grid-2">
+                    <!-- اسم الدواء -->
+                    <div class="form-group">
+                        <label class="form-label required" data-translate="drug_edit.drug_name">اسم الدواء</label>
+                        <input type="text" name="name" class="form-control" 
+                               value="{{ drug.name if drug else '' }}" 
+                               data-translate="drug_edit.name_placeholder" placeholder="اسم الدواء الكامل" required>
+                    </div>
+                    
+                    <!-- الفئة -->
+                    <div class="form-group">
+                        <label class="form-label required" data-translate="drug_edit.category">الفئة</label>
+                        <input type="text" name="category" class="form-control" 
+                               value="{{ drug.category if drug else '' }}" 
+                               data-translate="drug_edit.category_placeholder" placeholder="مثال: مسكنات، مضادات حيوية" required>
+                    </div>
+                </div>
+                
+                <!-- الوصف -->
+                <div class="form-group">
+                    <label class="form-label" data-translate="drug_edit.description">الوصف</label>
+                    <textarea name="description" class="form-control" 
+                              data-translate="drug_edit.description_placeholder" placeholder="وصف الدواء واستخداماته...">{{ drug.description if drug else '' }}</textarea>
+                </div>
+                
+                <!-- الجرعات المتاحة -->
+                <div class="form-group">
+                    <label class="form-label" data-translate="drug_edit.available_dosages">الجرعات المتاحة</label>
+                    <div id="dosages-container">
+                        {% if drug %}
+                            {% for dosage in drug.get_dosages() %}
+                            <div class="dynamic-field">
+                                <input type="text" name="dosages[]" class="form-control" 
+                                       value="{{ dosage }}" data-translate="drug_edit.dosage_placeholder" placeholder="مثال: 500 ملغ">
+                                <button type="button" class="btn-remove" onclick="removeDynamicField(this)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn-add mt-1" onclick="addDynamicField('dosages-container', 'dosages', translator.translate('drug_edit.dosage_placeholder'))">
+                        <i class="fa fa-plus"></i> <span data-translate="drug_edit.add_dosage">إضافة جرعة</span>
+                    </button>
+                </div>
+                
+                <!-- التداخلات الدوائية -->
+                <div class="form-group">
+                    <label class="form-label" data-translate="drug_edit.drug_interactions">التداخلات الدوائية</label>
+                    <div id="interactions-container">
+                        {% if drug %}
+                            {% for interaction in drug.get_interactions() %}
+                            <div class="dynamic-field">
+                                <input type="text" name="interactions[]" class="form-control" 
+                                       value="{{ interaction }}" data-translate="drug_edit.interaction_placeholder" placeholder="اسم الدواء المتداخل">
+                                <button type="button" class="btn-remove" onclick="removeDynamicField(this)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn-add mt-1" onclick="addDynamicField('interactions-container', 'interactions', translator.translate('drug_edit.interaction_placeholder'))">
+                        <i class="fa fa-plus"></i> <span data-translate="drug_edit.add_interaction">إضافة تداخل</span>
+                    </button>
+                </div>
+                
+                <!-- الموانع -->
+                <div class="form-group">
+                    <label class="form-label" data-translate="drug_edit.contraindications">الموانع</label>
+                    <div id="contraindications-container">
+                        {% if drug %}
+                            {% for contraindication in drug.get_contraindications() %}
+                            <div class="dynamic-field">
+                                <input type="text" name="contraindications[]" class="form-control" 
+                                       value="{{ contraindication }}" data-translate="drug_edit.contraindication_placeholder" placeholder="مانع الاستخدام">
+                                <button type="button" class="btn-remove" onclick="removeDynamicField(this)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn-add mt-1" onclick="addDynamicField('contraindications-container', 'contraindications', translator.translate('drug_edit.contraindication_placeholder'))">
+                        <i class="fa fa-plus"></i> <span data-translate="drug_edit.add_contraindication">إضافة مانع</span>
+                    </button>
+                </div>
+                
+                <!-- التحذيرات -->
+                <div class="form-group">
+                    <label class="form-label" data-translate="drug_edit.warnings">تحذيرات مهمة</label>
+                    <textarea name="warnings" class="form-control" 
+                              data-translate="drug_edit.warnings_placeholder" placeholder="تحذيرات طبية مهمة...">{{ drug.warnings if drug else '' }}</textarea>
+                </div>
+                
+                <!-- الحالة -->
+                <div class="form-group">
+                    <label class="form-label" data-translate="drug_edit.availability">حالة التوفر</label>
+                    <select name="available" class="form-control">
+                        <option value="true" {% if not drug or drug.available %}selected{% endif %} data-translate="drug_edit.available">متوفر</option>
+                        <option value="false" {% if drug and not drug.available %}selected{% endif %} data-translate="drug_edit.unavailable">غير متوفر</option>
+                    </select>
+                </div>
+                
+                <!-- الأزرار -->
+                <div class="flex mt-3" style="gap: 10px;">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa fa-save"></i> <span data-translate="drug_edit.save">حفظ البيانات</span>
+                    </button>
+                    <a href="{% if drug %}{{ url_for('drug_view', drug_id=drug.id) }}{% else %}{{ url_for('drugs_list') }}{% endif %}" 
+                       class="btn btn-secondary">
+                        <i class="fa fa-times"></i> <span data-translate="drug_edit.cancel">إلغاء</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// ترجمة القيم الموجودة في الحقول عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    translateFormValues();
+});
+
+// ترجمة القيم عند تبديل اللغة
+document.addEventListener('languageChanged', function() {
+    translateFormValues();
+});
+
+function translateFormValues() {
+    // ترجمة اسم الدواء في حقل الإدخال
+    const nameInput = document.querySelector('input[name="name"]');
+    if (nameInput && nameInput.value) {
+        const translatedName = translator.translateCommonDrugNames(nameInput.value);
+        const translatedUnits = translator.translateMedicalUnits(translatedName);
+        nameInput.value = translatedUnits;
+    }
+    
+    // ترجمة الفئة في حقل الإدخال
+    const categoryInput = document.querySelector('input[name="category"]');
+    if (categoryInput && categoryInput.value) {
+        categoryInput.value = translator.translateCategory(categoryInput.value);
+    }
+    
+    // ترجمة الجرعات المتاحة
+    const dosageInputs = document.querySelectorAll('input[name="dosages[]"]');
+    dosageInputs.forEach(input => {
+        if (input.value) {
+            input.value = translator.translateMedicalUnits(input.value);
+        }
+    });
+    
+    // ترجمة التداخلات الدوائية
+    const interactionInputs = document.querySelectorAll('input[name="interactions[]"]');
+    interactionInputs.forEach(input => {
+        if (input.value) {
+            const translated = translator.translateCommonDrugNames(input.value);
+            input.value = translator.translateMedicalUnits(translated);
+        }
+    });
+    
+    // ترجمة الموانع
+    const contraindicationInputs = document.querySelectorAll('input[name="contraindications[]"]');
+    contraindicationInputs.forEach(input => {
+        if (input.value) {
+            input.value = translator.translateMedicalUnits(input.value);
+        }
+    });
+}
+</script>
+{% endblock %}

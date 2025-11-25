@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+
+{% block title %}<span data-translate="patients.title">قائمة المرضى</span> - <span data-translate="app_name">وصفتي</span>{% endblock %}
+
+{% block content %}
+<div class="mt-3">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">
+                <i class="fa fa-users"></i>
+                <span data-translate="patients.title">قائمة المرضى</span>
+            </h1>
+            <a href="{{ url_for('patient_new') }}" class="btn btn-success">
+                <i class="fa fa-plus"></i> <span data-translate="patients.add_new">إضافة مريض جديد</span>
+            </a>
+        </div>
+        
+        <div class="card-body">
+            <!-- البحث -->
+            <div class="form-group">
+                <div class="search-box">
+                    <input type="text" class="form-control" data-translate="patients.search_placeholder" placeholder="البحث عن مريض (الاسم أو رقم الملف)..." 
+                           value="{{ search }}" 
+                           onchange="window.location.href='{{ url_for('patients_list') }}?search=' + this.value">
+                    <i class="fa fa-search"></i>
+                </div>
+            </div>
+            
+            {% if patients %}
+            <div class="table-container mt-2">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th data-translate="patients.file_number">رقم الملف</th>
+                            <th data-translate="patients.name">الاسم</th>
+                            <th data-translate="patients.age">العمر</th>
+                            <th data-translate="patients.gender">الجنس</th>
+                            <th data-translate="patients.contact">رقم الاتصال</th>
+                            <th data-translate="patients.actions">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td><strong>{{ patient.file_number }}</strong></td>
+                            <td>{{ patient.name }}</td>
+                            <td>{{ patient.age }} <span data-translate="patients.years">سنة</span></td>
+                            <td class="gender-cell">{{ patient.gender }}</td>
+                            <td>{{ patient.contact_info or '-' }}</td>
+                            <td>
+                                <div class="flex" style="gap: 5px;">
+                                    <a href="{{ url_for('patient_view', patient_id=patient.id) }}" 
+                                       class="btn btn-primary btn-sm">
+                                        <i class="fa fa-eye"></i> <span data-translate="patients.view">عرض</span>
+                                    </a>
+                                    <a href="{{ url_for('patient_edit', patient_id=patient.id) }}" 
+                                       class="btn btn-secondary btn-sm">
+                                        <i class="fa fa-edit"></i> <span data-translate="patients.edit">تعديل</span>
+                                    </a>
+                                    <a href="{{ url_for('patient_prescribe', patient_id=patient.id) }}" 
+                                       class="btn btn-success btn-sm">
+                                        <i class="fa fa-prescription"></i> <span data-translate="patients.prescribe">وصفة</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info mt-2">
+                <i class="fa fa-info-circle"></i>
+                {% if search %}
+                <span data-translate="patients.no_results">لا توجد نتائج للبحث</span> "{{ search }}"
+                {% else %}
+                <span data-translate="patients.no_patients">لا يوجد مرضى مسجلون في النظام</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends "layout.html" %}
+
+{% block title %}<span data-translate="nav.home">الرئيسية</span> - <span data-translate="app_name">وصفتي</span>{% endblock %}
+
+{% block content %}
+<div class="mt-3">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">
+                <i class="fa fa-prescription-bottle-medical"></i>
+                <span data-translate="home.welcome">مرحباً بك في نظام وصفتي</span>
+            </h1>
+        </div>
+        <div class="card-body">
+            <p style="font-size: 18px; line-height: 1.8;" data-translate="home.description">
+                نظام وصفتي هو نظام متكامل لإدارة الوصفات الطبية يساعد الأطباء على:
+            </p>
+            <ul style="font-size: 16px; line-height: 2; margin-right: 30px; margin-top: 20px;">
+                <li data-translate="home.feature1">إدارة بيانات المرضى وسجلاتهم الطبية</li>
+                <li data-translate="home.feature2">البحث عن الأدوية المتاحة وخصائصها</li>
+                <li data-translate="home.feature3">الحصول على اقتراحات دوائية ذكية بناءً على الأعراض</li>
+                <li data-translate="home.feature4">فحص التداخلات الدوائية والموانع تلقائياً</li>
+                <li data-translate="home.feature5">إنشاء وصفات طبية آمنة ومتكاملة</li>
+                <li data-translate="home.feature6">حفظ سجل الزيارات والوصفات السابقة</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="grid grid-3 mt-3">
+        <!-- بطاقة المرضى -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fa fa-users"></i>
+                    <span data-translate="home.patients_management">إدارة المرضى</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <p data-translate="home.patients_desc">عرض وإدارة بيانات المرضى، إضافة مرضى جدد، وتحديث السجلات الطبية.</p>
+                <div class="mt-2 flex" style="gap: 10px;">
+                    <a href="{{ url_for('patients_list') }}" class="btn btn-primary">
+                        <i class="fa fa-list"></i> <span data-translate="home.patients_list">قائمة المرضى</span>
+                    </a>
+                    <a href="{{ url_for('patient_new') }}" class="btn btn-success">
+                        <i class="fa fa-plus"></i> <span data-translate="home.new_patient">مريض جديد</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- بطاقة الأدوية -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fa fa-pills"></i>
+                    <span data-translate="home.drugs_database">قاعدة الأدوية</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <p data-translate="home.drugs_desc">البحث في قاعدة بيانات الأدوية، عرض التفاصيل، وإدارة معلومات الأدوية.</p>
+                <div class="mt-2 flex" style="gap: 10px;">
+                    <a href="{{ url_for('drugs_list') }}" class="btn btn-primary">
+                        <i class="fa fa-list"></i> <span data-translate="home.drugs_list">قائمة الأدوية</span>
+                    </a>
+                    <a href="{{ url_for('drug_new') }}" class="btn btn-success">
+                        <i class="fa fa-plus"></i> <span data-translate="home.new_drug">دواء جديد</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- بطاقة البحث السريع -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fa fa-search"></i>
+                    <span data-translate="home.quick_search">البحث السريع</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label" data-translate="home.search_patient">البحث عن مريض:</label>
+                    <div class="search-box">
+                        <input type="text" id="search-input" data-type="patients" 
+                               class="form-control" data-translate="home.search_placeholder" placeholder="اسم المريض أو رقم الملف...">
+                        <i class="fa fa-search"></i>
+                    </div>
+                </div>
+                <div id="search-results" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- معلومات النظام -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fa fa-info-circle"></i>
+                <span data-translate="home.features_title">ميزات النظام</span>
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="grid grid-2">
+                <div>
+                    <h3 style="color: var(--primary-color); margin-bottom: 15px;">
+                        <i class="fa fa-shield-halved"></i> <span data-translate="home.drug_safety">السلامة الدوائية</span>
+                    </h3>
+                    <p data-translate="home.drug_safety_desc">
+                        يقوم النظام بفحص التداخلات الدوائية والموانع تلقائياً لضمان سلامة المريض.
+                        يتم عرض تحذيرات واضحة عند وجود أي تعارضات محتملة.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 style="color: var(--secondary-color); margin-bottom: 15px;">
+                        <i class="fa fa-brain"></i> <span data-translate="home.smart_suggestions">اقتراحات ذكية</span>
+                    </h3>
+                    <p data-translate="home.smart_suggestions_desc">
+                        بناءً على الأعراض والتشخيص، يقترح النظام الأدوية المناسبة مع الأخذ في الاعتبار
+                        الأدوية الحالية للمريض وحساسياته.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 style="color: var(--success-color); margin-bottom: 15px;">
+                        <i class="fa fa-clock-rotate-left"></i> <span data-translate="home.comprehensive_record">سجل شامل</span>
+                    </h3>
+                    <p data-translate="home.comprehensive_record_desc">
+                        يحفظ النظام سجلاً كاملاً لجميع الزيارات والوصفات السابقة لكل مريض،
+                        مما يسهل المتابعة والرجوع إلى التاريخ الطبي.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 style="color: var(--warning-color); margin-bottom: 15px;">
+                        <i class="fa fa-database"></i> <span data-translate="home.comprehensive_database">قاعدة بيانات شاملة</span>
+                    </h3>
+                    <p data-translate="home.comprehensive_database_desc">
+                        قاعدة بيانات متكاملة للأدوية تحتوي على معلومات تفصيلية عن الجرعات،
+                        التداخلات، الموانع، والتحذيرات الطبية.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- تنبيه مهم -->
+    <div class="alert alert-warning mt-3">
+        <i class="fa fa-exclamation-triangle"></i>
+        <div>
+            <strong data-translate="home.important_note">ملاحظة مهمة:</strong>
+            <span data-translate="home.disclaimer">هذا النظام هو أداة مساعدة للأطباء ولا يغني عن الحكم الطبي المهني.
+            جميع البيانات المعروضة هي بيانات تجريبية لأغراض التدريب فقط.</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

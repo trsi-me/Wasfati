@@ -1,0 +1,206 @@
+{% extends "layout.html" %}
+
+{% block title %}<span data-translate="prescribe.new_prescription">وصفة طبية جديدة</span> - <span class="patient-name-title">{{ patient.name }}</span> - <span data-translate="app_name">وصفتي</span>{% endblock %}
+
+{% block content %}
+<div class="mt-3">
+    <!-- معلومات المريض -->
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">
+                <i class="fa fa-prescription"></i>
+                <span data-translate="prescribe.new_prescription">وصفة طبية جديدة</span> - <span class="patient-name-header">{{ patient.name }}</span>
+            </h1>
+            <a href="{{ url_for('patient_view', patient_id=patient.id) }}" class="btn btn-secondary">
+                <i class="fa fa-arrow-right"></i> <span data-translate="prescribe.back">العودة</span>
+            </a>
+        </div>
+        
+        <div class="card-body">
+            <div class="patient-info">
+                <div class="info-item">
+                    <div class="info-label" data-translate="prescribe.file_number">رقم الملف</div>
+                    <div class="info-value">{{ patient.file_number }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label" data-translate="prescribe.age">العمر</div>
+                    <div class="info-value">{{ patient.age }} <span data-translate="prescribe.years">سنة</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label" data-translate="prescribe.gender">الجنس</div>
+                    <div class="info-value" class="gender-cell">{{ patient.gender }}</div>
+                </div>
+            </div>
+            
+            <!-- تحذيرات -->
+            {% set allergies = patient.get_allergies() %}
+            {% if allergies %}
+            <div class="alert alert-danger mt-2">
+                <i class="fa fa-triangle-exclamation"></i>
+                <div>
+                    <strong data-translate="prescribe.allergy_warning">تنبيه: المريض لديه حساسية من:</strong>
+                    <ul style="margin: 5px 0 0 20px;">
+                        {% for allergy in allergies %}
+                        <li class="allergy-name">{{ allergy }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% set medications = patient.get_current_medications() %}
+            {% if medications %}
+            <div class="alert alert-warning mt-2">
+                <i class="fa fa-pills"></i>
+                <div>
+                    <strong data-translate="prescribe.current_medications">الأدوية الحالية للمريض:</strong>
+                    <ul style="margin: 5px 0 0 20px;">
+                        {% for med in medications %}
+                        <li class="medication-name">{{ med }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- معلومات الزيارة -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fa fa-stethoscope"></i>
+                <span data-translate="prescribe.visit_info">معلومات الزيارة</span>
+            </h2>
+        </div>
+        
+        <div class="card-body">
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label class="form-label required" data-translate="prescribe.symptoms">الأعراض</label>
+                    <textarea id="symptoms" class="form-control" 
+                              data-translate="prescribe.symptoms_placeholder" placeholder="اكتب الأعراض التي يعاني منها المريض..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label required" data-translate="prescribe.diagnosis">التشخيص</label>
+                    <textarea id="diagnosis" class="form-control" 
+                              data-translate="prescribe.diagnosis_placeholder" placeholder="التشخيص الطبي..."></textarea>
+                </div>
+            </div>
+            
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label class="form-label" data-translate="prescribe.doctor_name">اسم الطبيب</label>
+                    <input type="text" id="doctor_name" class="form-control" 
+                           data-translate="prescribe.doctor_placeholder" placeholder="د. ..." value="د. غير محدد">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" data-translate="prescribe.notes">ملاحظات إضافية</label>
+                    <input type="text" id="notes" class="form-control" 
+                           data-translate="prescribe.notes_placeholder" placeholder="ملاحظات...">
+                </div>
+            </div>
+            
+            <button type="button" class="btn btn-primary" onclick="suggestPrescription({{ patient.id }})">
+                <i class="fa fa-wand-magic-sparkles"></i> <span data-translate="prescribe.suggest_drugs">اقتراح أدوية مناسبة</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Loading -->
+    <div id="loading" class="hidden text-center mt-3">
+        <div class="loading" style="width: 40px; height: 40px; border-width: 4px;"></div>
+        <p style="margin-top: 10px; color: var(--text-secondary);" data-translate="prescribe.searching">جاري البحث عن الأدوية المناسبة...</p>
+    </div>
+    
+    <!-- الاقتراحات -->
+    <div id="suggestions-section" class="card mt-3 hidden">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fa fa-lightbulb"></i>
+                <span data-translate="prescribe.suggested_drugs">الأدوية المقترحة</span>
+            </h2>
+        </div>
+        
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fa fa-info-circle"></i>
+                <span data-translate="prescribe.select_info">اختر الأدوية المناسبة من القائمة أدناه. الأدوية مرتبة حسب الأمان والتوافق مع حالة المريض.</span>
+            </div>
+            
+            <div id="suggestions" class="suggestions-container"></div>
+        </div>
+    </div>
+    
+    <!-- الوصفة النهائية -->
+    <div id="prescription-section" class="card mt-3 hidden">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fa fa-file-prescription"></i>
+                <span data-translate="prescribe.prescription">الوصفة الطبية</span>
+            </h2>
+        </div>
+        
+        <div class="card-body">
+            <div id="selected-drugs-list"></div>
+            
+            <div class="mt-3 flex" style="gap: 10px;">
+                <button type="button" class="btn btn-success btn-lg" onclick="savePrescription({{ patient.id }})">
+                    <i class="fa fa-save"></i> <span data-translate="prescribe.save_prescription">حفظ الوصفة</span>
+                </button>
+                <a href="{{ url_for('patient_view', patient_id=patient.id) }}" class="btn btn-secondary btn-lg">
+                    <i class="fa fa-times"></i> <span data-translate="prescribe.cancel">إلغاء</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ترجمة المحتوى عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    translatePrescribeContent();
+});
+
+// ترجمة المحتوى عند تبديل اللغة
+document.addEventListener('languageChanged', function() {
+    translatePrescribeContent();
+});
+
+function translatePrescribeContent() {
+    // ترجمة الجندر
+    const genderCells = document.querySelectorAll('.gender-cell');
+    genderCells.forEach(cell => {
+        const gender = cell.textContent.trim();
+        cell.textContent = translator.translateGender(gender);
+    });
+    
+    // ترجمة الحساسيات
+    const allergyNames = document.querySelectorAll('.allergy-name');
+    allergyNames.forEach(name => {
+        const allergy = name.textContent.trim();
+        const translated = translator.translateCommonDrugNames(allergy);
+        name.textContent = translator.translateMedicalUnits(translated);
+    });
+    
+    // ترجمة الأدوية الحالية
+    const medicationNames = document.querySelectorAll('.medication-name');
+    medicationNames.forEach(name => {
+        const drugName = name.textContent.trim();
+        const translated = translator.translateCommonDrugNames(drugName);
+        name.textContent = translator.translateMedicalUnits(translated);
+    });
+}
+
+// تحديث العرض عند الحصول على اقتراحات
+const originalDisplaySuggestions = displaySuggestions;
+displaySuggestions = function(suggestions) {
+    originalDisplaySuggestions(suggestions);
+    document.getElementById('suggestions-section').classList.remove('hidden');
+    document.getElementById('prescription-section').classList.remove('hidden');
+    updateSelectedDrugsList();
+};
+</script>
+{% endblock %}

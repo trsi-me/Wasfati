@@ -1,0 +1,124 @@
+{% extends "layout.html" %}
+
+{% block title %}{% if patient %}<span data-translate="patient_edit.title_edit">تعديل بيانات المريض</span>{% else %}<span data-translate="patient_edit.title_new">إضافة مريض جديد</span>{% endif %} - <span data-translate="app_name">وصفتي</span>{% endblock %}
+
+{% block content %}
+<div class="mt-3">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">
+                <i class="fa fa-user-edit"></i>
+                {% if patient %}<span data-translate="patient_edit.title_edit">تعديل بيانات المريض</span>{% else %}<span data-translate="patient_edit.title_new">إضافة مريض جديد</span>{% endif %}
+            </h1>
+        </div>
+        
+        <div class="card-body">
+            <form id="patient-form" onsubmit="event.preventDefault(); savePatient('patient-form', {{ patient.id if patient else 'null' }});">
+                <div class="grid grid-2">
+                    <!-- رقم الملف -->
+                    <div class="form-group">
+                        <label class="form-label required" data-translate="patient_edit.file_number">رقم الملف</label>
+                        <input type="text" name="file_number" class="form-control" 
+                               value="{{ patient.file_number if patient else '' }}" 
+                               data-translate="patient_edit.file_number_placeholder" placeholder="مثال: P001" required>
+                    </div>
+                    
+                    <!-- الاسم -->
+                    <div class="form-group">
+                        <label class="form-label required" data-translate="patient_edit.full_name">الاسم الكامل</label>
+                        <input type="text" name="name" class="form-control" 
+                               value="{{ patient.name if patient else '' }}" 
+                               data-translate="patient_edit.name_placeholder" placeholder="الاسم الكامل" required>
+                    </div>
+                    
+                    <!-- العمر -->
+                    <div class="form-group">
+                        <label class="form-label required" data-translate="patient_edit.age">العمر</label>
+                        <input type="number" name="age" class="form-control" 
+                               value="{{ patient.age if patient else '' }}" 
+                               data-translate="patient_edit.age_placeholder" placeholder="العمر بالسنوات" min="0" max="150" required>
+                    </div>
+                    
+                    <!-- الجنس -->
+                    <div class="form-group">
+                        <label class="form-label required" data-translate="patient_edit.gender">الجنس</label>
+                        <select name="gender" class="form-control" required>
+                            <option value="" data-translate="patient_edit.select_gender">اختر الجنس</option>
+                            <option value="ذكر" {% if patient and patient.gender == 'ذكر' %}selected{% endif %} data-translate="patient_edit.male">ذكر</option>
+                            <option value="أنثى" {% if patient and patient.gender == 'أنثى' %}selected{% endif %} data-translate="patient_edit.female">أنثى</option>
+                        </select>
+                    </div>
+                    
+                    <!-- رقم الاتصال -->
+                    <div class="form-group">
+                        <label class="form-label" data-translate="patient_edit.contact">رقم الاتصال</label>
+                        <input type="text" name="contact_info" class="form-control" 
+                               value="{{ patient.contact_info if patient else '' }}" 
+                               data-translate="patient_edit.contact_placeholder" placeholder="رقم الهاتف">
+                    </div>
+                </div>
+                
+                <!-- التاريخ الطبي -->
+                <div class="form-group">
+                    <label class="form-label" data-translate="patient_edit.medical_history">التاريخ الطبي</label>
+                    <textarea name="medical_history" class="form-control" 
+                              data-translate="patient_edit.medical_history_placeholder" placeholder="الأمراض المزمنة، العمليات السابقة، إلخ...">{{ patient.medical_history if patient else '' }}</textarea>
+                </div>
+                
+                <!-- الأدوية الحالية -->
+                <div class="form-group">
+                    <label class="form-label" data-translate="patient_edit.current_medications">الأدوية الحالية</label>
+                    <div id="medications-container">
+                        {% if patient %}
+                            {% for med in patient.get_current_medications() %}
+                            <div class="dynamic-field">
+                                <input type="text" name="current_medications[]" class="form-control" 
+                                       value="{{ med }}" data-translate="patient_edit.medication_placeholder" placeholder="اسم الدواء والجرعة">
+                                <button type="button" class="btn-remove" onclick="removeDynamicField(this)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn-add mt-1" onclick="addDynamicField('medications-container', 'current_medications', translator.translate('patient_edit.medication_placeholder'))">
+                        <i class="fa fa-plus"></i> <span data-translate="patient_edit.add_medication">إضافة دواء</span>
+                    </button>
+                </div>
+                
+                <!-- الحساسيات -->
+                <div class="form-group">
+                    <label class="form-label" data-translate="patient_edit.allergies">الحساسيات والموانع</label>
+                    <div id="allergies-container">
+                        {% if patient %}
+                            {% for allergy in patient.get_allergies() %}
+                            <div class="dynamic-field">
+                                <input type="text" name="allergies[]" class="form-control" 
+                                       value="{{ allergy }}" data-translate="patient_edit.allergy_placeholder" placeholder="اسم المادة أو الدواء">
+                                <button type="button" class="btn-remove" onclick="removeDynamicField(this)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn-add mt-1" onclick="addDynamicField('allergies-container', 'allergies', translator.translate('patient_edit.allergy_placeholder'))">
+                        <i class="fa fa-plus"></i> <span data-translate="patient_edit.add_allergy">إضافة حساسية</span>
+                    </button>
+                </div>
+                
+                <!-- الأزرار -->
+                <div class="flex mt-3" style="gap: 10px;">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa fa-save"></i> <span data-translate="patient_edit.save">حفظ البيانات</span>
+                    </button>
+                    <a href="{% if patient %}{{ url_for('patient_view', patient_id=patient.id) }}{% else %}{{ url_for('patients_list') }}{% endif %}" 
+                       class="btn btn-secondary">
+                        <i class="fa fa-times"></i> <span data-translate="patient_edit.cancel">إلغاء</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

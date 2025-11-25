@@ -1,0 +1,254 @@
+{% extends "layout.html" %}
+
+{% block title %}<span class="patient-name-title">{{ patient.name }}</span> - <span data-translate="app_name">وصفتي</span>{% endblock %}
+
+{% block content %}
+<div class="mt-3">
+    <!-- معلومات المريض -->
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">
+                <i class="fa fa-user"></i>
+                <span class="patient-name-header">{{ patient.name }}</span>
+            </h1>
+            <div class="flex" style="gap: 10px;">
+                <a href="{{ url_for('patient_edit', patient_id=patient.id) }}" class="btn btn-secondary">
+                    <i class="fa fa-edit"></i> <span data-translate="patient_view.edit_data">تعديل البيانات</span>
+                </a>
+                <a href="{{ url_for('patient_prescribe', patient_id=patient.id) }}" class="btn btn-success">
+                    <i class="fa fa-prescription"></i> <span data-translate="patient_view.new_prescription">وصفة جديدة</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <div class="patient-info">
+                <div class="info-item">
+                    <div class="info-label" data-translate="patient_view.file_number">رقم الملف</div>
+                    <div class="info-value">{{ patient.file_number }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label" data-translate="patient_view.age">العمر</div>
+                    <div class="info-value">{{ patient.age }} <span data-translate="patient_view.years">سنة</span></div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label" data-translate="patient_view.gender">الجنس</div>
+                    <div class="info-value" class="gender-cell">{{ patient.gender }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label" data-translate="patient_view.contact">رقم الاتصال</div>
+                    <div class="info-value">{{ patient.contact_info or '-' }}</div>
+                </div>
+            </div>
+            
+            <!-- التاريخ الطبي -->
+            {% if patient.medical_history %}
+            <div class="mt-3">
+                <h3 style="color: var(--primary-color); margin-bottom: 10px;">
+                    <i class="fa fa-notes-medical"></i> <span data-translate="patient_view.medical_history">التاريخ الطبي</span>
+                </h3>
+                <div style="padding: 15px; background-color: var(--secondary-bg); border-radius: 8px;">
+                    {{ patient.medical_history }}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- الأدوية الحالية -->
+            <div class="mt-3">
+                <h3 style="color: var(--primary-color); margin-bottom: 10px;">
+                    <i class="fa fa-pills"></i> <span data-translate="patient_view.current_medications">الأدوية الحالية</span>
+                </h3>
+                {% set medications = patient.get_current_medications() %}
+                {% if medications %}
+                <ul class="medication-list">
+                    {% for med in medications %}
+                    <li class="medication-item">
+                        <i class="fa fa-capsules" style="color: var(--secondary-color);"></i>
+                        <span class="medication-name">{{ med }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fa fa-info-circle"></i>
+                    <span data-translate="patient_view.no_medications">لا يتناول المريض أي أدوية حالياً</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- الحساسيات -->
+            <div class="mt-3">
+                <h3 style="color: var(--danger-color); margin-bottom: 10px;">
+                    <i class="fa fa-triangle-exclamation"></i> <span data-translate="patient_view.allergies">الحساسيات والموانع</span>
+                </h3>
+                {% set allergies = patient.get_allergies() %}
+                {% if allergies %}
+                <ul class="medication-list">
+                    {% for allergy in allergies %}
+                    <li class="medication-item" style="border-right: 3px solid var(--danger-color);">
+                        <i class="fa fa-exclamation-circle" style="color: var(--danger-color);"></i>
+                        <span class="allergy-name">{{ allergy }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="alert alert-success">
+                    <i class="fa fa-check-circle"></i>
+                    <span data-translate="patient_view.no_allergies">لا توجد حساسيات مسجلة</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- سجل الزيارات -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fa fa-clock-rotate-left"></i>
+                <span data-translate="patient_view.visit_history">سجل الزيارات والوصفات</span>
+            </h2>
+        </div>
+        
+        <div class="card-body">
+            {% if visits %}
+            <div class="grid" style="gap: 20px;">
+                {% for visit in visits %}
+                <div class="card" style="background-color: var(--secondary-bg);">
+                    <div class="card-header" style="border-color: var(--border-color);">
+                        <div>
+                            <div style="font-size: 18px; font-weight: 600;">
+                                <i class="fa fa-calendar"></i>
+                                {{ visit.visit_date.strftime('%Y-%m-%d %H:%M') }}
+                            </div>
+                            <div style="color: var(--text-muted); margin-top: 5px;">
+                                <i class="fa fa-user-doctor"></i>
+                                {{ visit.doctor_name }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        {% if visit.symptoms %}
+                        <div class="mb-2">
+                            <strong style="color: var(--text-primary);" data-translate="patient_view.symptoms">الأعراض:</strong>
+                            <div style="color: var(--text-secondary); margin-top: 5px;">{{ visit.symptoms }}</div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if visit.diagnosis %}
+                        <div class="mb-2">
+                            <strong style="color: var(--text-primary);" data-translate="patient_view.diagnosis">التشخيص:</strong>
+                            <div style="color: var(--text-secondary); margin-top: 5px;">{{ visit.diagnosis }}</div>
+                        </div>
+                        {% endif %}
+                        
+                        {% set prescription = visit.get_prescription() %}
+                        {% if prescription %}
+                        <div class="mt-2">
+                            <strong style="color: var(--primary-color);">
+                                <i class="fa fa-prescription"></i> <span data-translate="patient_view.prescription">الوصفة الطبية:</span>
+                            </strong>
+                            <div class="mt-1">
+                                {% for drug in prescription %}
+                                <div class="prescription-item" style="margin-bottom: 10px;">
+                                    <div class="drug-name prescription-drug-name" style="font-size: 16px;">{{ drug.drug_name }}</div>
+                                    <div class="drug-details" style="font-size: 14px;">
+                                        <div class="drug-detail">
+                                            <span class="drug-detail-label" data-translate="patient_view.dosage">الجرعة:</span>
+                                            <span class="drug-detail-value dosage-value">{{ drug.dosage }}</span>
+                                        </div>
+                                        {% if drug.duration %}
+                                        <div class="drug-detail">
+                                            <span class="drug-detail-label" data-translate="patient_view.duration">المدة:</span>
+                                            <span class="drug-detail-value">{{ drug.duration }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if drug.instructions %}
+                                        <div class="drug-detail">
+                                            <span class="drug-detail-label" data-translate="patient_view.instructions">التعليمات:</span>
+                                            <span class="drug-detail-value">{{ drug.instructions }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if visit.notes %}
+                        <div class="mt-2">
+                            <strong style="color: var(--text-primary);" data-translate="patient_view.notes">ملاحظات:</strong>
+                            <div style="color: var(--text-secondary); margin-top: 5px;">{{ visit.notes }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fa fa-info-circle"></i>
+                <span data-translate="patient_view.no_visits">لا توجد زيارات مسجلة لهذا المريض</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// ترجمة المحتوى الديناميكي عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    translatePatientViewContent();
+});
+
+// ترجمة المحتوى عند تبديل اللغة
+document.addEventListener('languageChanged', function() {
+    translatePatientViewContent();
+});
+
+function translatePatientViewContent() {
+    // ترجمة الجندر
+    const genderCells = document.querySelectorAll('.gender-cell');
+    genderCells.forEach(cell => {
+        const gender = cell.textContent.trim();
+        cell.textContent = translator.translateGender(gender);
+    });
+    
+    // ترجمة أسماء الأدوية الحالية
+    const medicationNames = document.querySelectorAll('.medication-name');
+    medicationNames.forEach(name => {
+        const drugName = name.textContent.trim();
+        const translated = translator.translateCommonDrugNames(drugName);
+        name.textContent = translator.translateMedicalUnits(translated);
+    });
+    
+    // ترجمة الحساسيات
+    const allergyNames = document.querySelectorAll('.allergy-name');
+    allergyNames.forEach(name => {
+        const allergy = name.textContent.trim();
+        const translated = translator.translateCommonDrugNames(allergy);
+        name.textContent = translator.translateMedicalUnits(translated);
+    });
+    
+    // ترجمة أسماء الأدوية في الوصفات
+    const prescriptionDrugNames = document.querySelectorAll('.prescription-drug-name');
+    prescriptionDrugNames.forEach(name => {
+        const drugName = name.textContent.trim();
+        const translated = translator.translateCommonDrugNames(drugName);
+        name.textContent = translator.translateMedicalUnits(translated);
+    });
+    
+    // ترجمة الجرعات في الوصفات
+    const dosageValues = document.querySelectorAll('.dosage-value');
+    dosageValues.forEach(value => {
+        const dosage = value.textContent.trim();
+        value.textContent = translator.translateMedicalUnits(dosage);
+    });
+}
+</script>
+{% endblock %}
