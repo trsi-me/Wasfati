@@ -195,12 +195,30 @@ function translatePrescribeContent() {
 }
 
 // تحديث العرض عند الحصول على اقتراحات
-const originalDisplaySuggestions = displaySuggestions;
-displaySuggestions = function(suggestions) {
-    originalDisplaySuggestions(suggestions);
-    document.getElementById('suggestions-section').classList.remove('hidden');
-    document.getElementById('prescription-section').classList.remove('hidden');
-    updateSelectedDrugsList();
-};
+// انتظار تحميل displaySuggestions من main.js
+function wrapDisplaySuggestions() {
+    if (typeof displaySuggestions === 'undefined') {
+        // إذا لم يتم تحميل displaySuggestions بعد، انتظر قليلاً ثم حاول مرة أخرى
+        setTimeout(wrapDisplaySuggestions, 100);
+        return;
+    }
+    
+    const originalDisplaySuggestions = displaySuggestions;
+    displaySuggestions = function(suggestions) {
+        originalDisplaySuggestions(suggestions);
+        document.getElementById('suggestions-section').classList.remove('hidden');
+        document.getElementById('prescription-section').classList.remove('hidden');
+        if (typeof updateSelectedDrugsList === 'function') {
+            updateSelectedDrugsList();
+        }
+    };
+}
+
+// محاولة التفاف displaySuggestions عند تحميل الصفحة
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wrapDisplaySuggestions);
+} else {
+    wrapDisplaySuggestions();
+}
 </script>
 {% endblock %}
