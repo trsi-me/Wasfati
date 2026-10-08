@@ -12,7 +12,7 @@ with app.app_context():
         print(f"نشط: {user.is_active}")
         
         # اختبار كلمة المرور
-        if user.check_password('admin123'):
+        if user.check_password(''):
             print("\n✓ كلمة المرور صحيحة!")
         else:
             print("\n✗ كلمة المرور غير صحيحة!")

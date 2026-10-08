@@ -329,7 +329,7 @@ def add_sample_data():
     # إضافة مستخدم افتراضي (admin)
     if User.query.count() == 0:
         admin = User(username='admin', full_name='المسؤول')
-        admin.set_password('admin123')
+        admin.set_password('')
         db.session.add(admin)
     
     db.session.commit()
